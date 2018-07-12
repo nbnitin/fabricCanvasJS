@@ -1,0 +1,163 @@
+<html>
+<head>
+    <script src="fabric.js"></script>
+    <style>
+      .canvasDiv{
+        float:right;
+        width:80%;
+      }
+      .controlDiv{
+        float:left;
+        width:20%;
+      }
+      .controlDiv>input{
+        float: left;
+        width:100%;
+        /*margin-top:30px;*/
+        padding:10px;
+        height:40px;
+      }
+    </style>
+</head>
+
+<body>
+  <div class="canvasDiv">
+    <canvas id="canvas" width="800" height="450" style="border:1px solid #000000"></canvas>
+  </div>
+  <div class="controlDiv">
+    <input type="button" onclick="addTextToCanvas()" value="Add text" />
+    <input type="text" id="txt1" onKeyPress="changeText(this.value)" style="display:none;"/>
+    <input type="color" id="colorWell" />
+    <input type="file" id="uploadedImg" onChange="addImageToCanvas(this)"/>
+    <input type="button" onClick="saveCanvas()" value="saveCanvas" />
+  </div>
+
+    <script>
+      var  colorWell = document.querySelector("#colorWell");
+      colorWell.value = "black";
+      colorWell.addEventListener("input", updateFirst, false);
+      colorWell.addEventListener("change", updateAll, false);
+      colorWell.select();
+
+        var canvas = new fabric.Canvas('canvas');
+        canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }));
+
+        canvas.selectionColor = 'rgba(0,255,0,0.3)';
+        canvas.selectionBorderColor = 'red';
+        canvas.selectionLineWidth = 5;
+
+        canvas.on('mouse:down',function(event){
+          if(canvas.getActiveObject()){
+            if(event.target.get('type') != "text"){
+              let ele = document.getElementById("txt1");
+                if(ele.style.display == "block"){
+                  ele.style.display = "none";
+                }
+            }
+          }
+        });
+
+        // canvas.on('selection:cleared',function(e){
+        //
+        //   console.log(e);
+        //
+        //
+        //   let ele = document.getElementById("txt1");
+        //   if(ele.style.display == "block"){
+        //     ele.style.display = "none";
+        //   }
+        // });
+
+
+        // canvas.on('object:selected', function(e) {
+        //   //e.target.item(1).setText('Selectedoooooooo');
+        //   console.log(e);
+        // });
+        //
+        // canvas.on('selection:created', function () {
+        //   console.log("ii");
+        // });
+
+        function addTextToCanvas(){
+          var text = new fabric.Text('hello world', { left: 100, top: 100 });
+          text.on('selected', function() {
+              console.log('selected a rectangle');
+              document.getElementById("txt1").style.display="block";
+          });
+          // text.on('selection:cleared',function(){
+          //   console.log('un selected a rectangle');
+          //   document.getElementById("txt1").style.display="none";
+          // });
+          canvas.add(text);
+        }
+
+        function changeText(str){
+          var obj = canvas.getActiveObject();
+          // if (!obj) return;
+          obj.set('text',str);
+          canvas.renderAll();
+        }
+
+        function updateFirst(event) {
+
+
+          var obj = canvas.getActiveObject();
+          // if (!obj) return;
+          obj.setColor(event.target.value);
+          canvas.renderAll();
+
+        }
+        function updateAll(event) {
+          //alert("i m here, "+event.target.value);
+        }
+
+        function addImageToCanvas(e){
+          var reader = new FileReader();
+          reader.onload = function (event){
+          var imgObj = new Image();
+          imgObj.src = event.target.result;
+          imgObj.onload = function () {
+          var image = new fabric.Image(imgObj);
+
+          image.set({
+            angle: 0,
+            padding: 2,
+            cornersize:10,
+            // height:110,
+            // width:110,
+            scaleX: 150 / image.width,
+            scaleY: 150 / image.height
+          });
+          // image.scale(0.2).set({
+          //   left: 100,
+          //   top: 100,
+          // });
+          canvas.centerObject(image);
+          canvas.add(image);
+
+          canvas.renderAll();
+    }
+  }
+
+    reader.readAsDataURL(e.files[0]);
+        }
+
+
+        function saveCanvas(){
+          var dataURL = canvas.toDataURL({format: 'png', quality: 0.8});
+          //window.open(canvas.toDataURL("image/png"), '_blank');
+          var iframe = "<iframe width='100%' height='100%' src='" +
+         dataURL + "'></iframe>"
+                         var x = window.open();
+                         x.document.open();
+                         x.document.write(iframe);
+                         x.document.close();
+        //  var stringJson = JSON.stringify(this.canvas);
+
+        }
+
+    </script>
+
+
+</body>
+</html>
