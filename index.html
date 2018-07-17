@@ -1,5 +1,6 @@
 <html>
 <head>
+
     <script src="fabric.js"></script>
     <style>
       .canvasDiv{
@@ -10,10 +11,19 @@
         float:left;
         width:20%;
       }
-      .controlDiv>input{
-        float: left;
+      .controlDiv>div{
+        margin-bottom: 10px;
         width:100%;
-        /*margin-top:30px;*/
+        float:left;
+      }
+
+      .btn{
+          background: whitesmoke;
+      }
+      .controlDiv>div>input{
+
+        width:90%;
+        margin:0 auto;
         padding:10px;
         height:40px;
       }
@@ -25,11 +35,21 @@
     <canvas id="canvas" width="800" height="450" style="border:1px solid #000000"></canvas>
   </div>
   <div class="controlDiv">
-    <input type="button" onclick="addTextToCanvas()" value="Add text" />
+    <div>
+    <input class="btn" type="button" onclick="addTextToCanvas()" value="Add text" />
+  </div>
+  <div>
     <input type="text" id="txt1" onKeyPress="changeText(this.value)" style="display:none;"/>
+  </div>
+  <div>
     <input type="color" id="colorWell" />
+  </div>
+  <div>
     <input type="file" id="uploadedImg" onChange="addImageToCanvas(this)"/>
-    <input type="button" onClick="saveCanvas()" value="saveCanvas" />
+  </div>
+  <div>
+    <input class="btn" type="button" onClick="saveCanvas()" value="saveCanvas" />
+  </div>
   </div>
 
     <script>
@@ -46,11 +66,24 @@
         canvas.selectionBorderColor = 'red';
         canvas.selectionLineWidth = 5;
 
+
+
+        fabric.Image.fromURL('http://fabricjs.com/assets/pug_small.jpg', function(myImg) {
+          //i create an extra var for to change some image properties
+          var img1 = myImg.set({ left: 0, top: 0,scaleX: 150 / myImg.width,
+          scaleY: 150 / myImg.height});
+          canvas.add(img1);
+          canvas.centerObject(img1);
+        });
+
+
+
         canvas.on('mouse:down',function(event){
           if(canvas.getActiveObject()){
             if(event.target.get('type') != "text"){
               let ele = document.getElementById("txt1");
-                if(ele.style.display == "block"){
+
+                if( ele.style.display != "none" ) {
                   ele.style.display = "none";
                 }
             }
@@ -82,7 +115,7 @@
           var text = new fabric.Text('hello world', { left: 100, top: 100 });
           text.on('selected', function() {
               console.log('selected a rectangle');
-              document.getElementById("txt1").style.display="block";
+              document.getElementById("txt1").style.display="inline";
           });
           // text.on('selection:cleared',function(){
           //   console.log('un selected a rectangle');
