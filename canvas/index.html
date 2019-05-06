@@ -1,0 +1,386 @@
+<html>
+<body>
+   <head>
+      <title>Canvas Demo</title> 
+      <LINK REL=StyleSheet href="css/style.css" TYPE="text/css" MEDIA=screen>     
+      <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+      <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
+<meta charset="utf-8"/>
+   </head>
+   <div class="canvas_section">
+        <canvas id="textcanvas" width=697 height=400 style="border: 2px solid #3a3838;z-index: -1;"></canvas> 
+        <canvas id="imageCanvas" width="697" height="400" style="border: 2px solid #3a3838;top: 8px;left: 48;position: absolute;"></canvas>
+        <canvas id="imageCanvas1" width="697" height="400" style="border: 2px solid #3a3838;top: 8px;left: 48;position: absolute;z-index: -1;"></canvas>
+       <div>
+         <p id="add_image">Add Image</p>
+         <input type="file" id="imageLoader" name="imageLoader"/>
+       <!--  <p id="text_add">Add Text</p>
+         <p id="text_add_section" style="display:none;">
+            <input type="text" id="add_text" name="add_text" placeholder="Write text here to add">
+            <input type="button" id="add_new_text" value="Add Text">
+         </p>-->
+         <p id="download_cre" onclick="download_image()">Download</p>
+      </div>
+   </div>
+   <ul id="url-list"><li><img onclick="changecanvasbac(this)" src="images/index.jpeg"><h4>test</h4></li><li><img onclick="changecanvasbac(this)" src="images/index1.jpg"><h4>test1</h4></li><li><img onclick="changecanvasbac(this)" src="images/index2.jpg"><h4>test2</h4></li><li><img onclick="changecanvasbac(this)" src="images/index3.jpg"><h4>test3</h4></li></ul>
+   
+   <div id="downloadDiv" style="display:block;">
+     	
+   </div>
+</body>
+</html>
+
+ <script>
+
+var overlayCanvases = function(cnv1, cnv2, cnv3) {
+
+    var newCanvas = document.createElement('canvas'),
+        ctx = newCanvas.getContext('2d'),
+        width = cnv1.width,
+        height = cnv1.height;
+
+    newCanvas.width = width;
+    newCanvas.height = height;
+
+    [cnv1, cnv3].forEach(function(n) {
+        ctx.beginPath();
+        ctx.drawImage(n, 0, 0, width, height);
+    });
+
+    return newCanvas.toDataURL();
+};
+
+
+
+   /***************to get and set image on top 4 section*******/
+   
+   // var site_url = 'http://localhost/canvas/';
+   // $.ajax({
+   //     type: "POST",
+   //     dataType: 'json',
+   //     url: site_url+"getimages.php",
+   //     success: function (data) {
+   //         var json = data;
+   //         $.each(data, function (index, nazriya) {
+   //             $('#url-list').append('<li>' + '<img onclick="changecanvasbac(this)" src="'+nazriya.imageurl+'"/>' +
+   //                 '<h4>' + nazriya.name + '</h4>' +
+   //                 '</li>');
+   //         });
+   //     },
+   //     error: function(jqXHR, status, errorText) {
+   //         alert('Status code: ' + jqXHR.status +
+   //               '\nStatus text: ' + status + '\nError thrown: ' + errorText);
+   //     }
+   // });
+
+      /********on click image set image in canvas background*********/
+      function changecanvasbac(img)
+      {
+        $('#textcanvas').css('z-index','-1');
+        $('#imageCanvas').css('z-index','1');
+        $('#imageCanvas1').css('z-index','-1');
+        var name = img.src;
+        var ctx = document.getElementById('imageCanvas').getContext('2d');
+
+          //  canvas Drag
+          var img = new Image();
+          img.onload = function(){
+              ctx.drawImage(img, 0,0);
+          };
+
+        var canvasOffset=$("#imageCanvas").offset();
+        var offsetX=canvasOffset.left;
+        var offsetY=canvasOffset.top;
+        var canvasWidth=canvas.width;
+        var canvasHeight=canvas.height;
+        var isDragging=false;
+
+        function handleMouseDown(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // set the drag flag
+          isDragging=true;
+        }
+
+        function handleMouseUp(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // clear the drag flag
+          isDragging=false;
+        }
+
+        function handleMouseOut(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // user has left the canvas, so clear the drag flag
+          //isDragging=false;
+        }
+
+        function handleMouseMove(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // if the drag flag is set, clear the canvas and draw the image
+          if(isDragging){
+              ctx.clearRect(0,0,canvasWidth,canvasHeight);
+              ctx.drawImage(img,canMouseX-128/2,canMouseY-120/2,697,400);
+          }
+        }
+
+        $("#imageCanvas").mousedown(function(e){handleMouseDown(e);});
+        $("#imageCanvas").mousemove(function(e){handleMouseMove(e);});
+        $("#imageCanvas").mouseup(function(e){handleMouseUp(e);});
+        $("#imageCanvas").mouseout(function(e){handleMouseOut(e);});
+        // drag End
+
+        var img = new Image();
+        img.onload = function() {
+          ctx.drawImage(img, 0, 0, 697, 400);
+        };
+        img.src = name;
+    }
+
+    /***********on click upload image from system trigger upload************/
+    $('#add_image').click(function(){ 
+      $('#imageLoader').trigger('click');
+      //$("#imageCanvas1").off() 
+    });
+    
+    /***********on upload image set image in canvas************/
+    var imageLoader = document.getElementById('imageLoader');
+    imageLoader.addEventListener('change', handleImage, false);
+    var canvas = document.getElementById('imageCanvas1');
+    var ctx = canvas.getContext('2d');
+
+    function handleImage(e){
+      $('#textcanvas').css('z-index','-1');
+      $('#imageCanvas').css('z-index','-1');
+      $('#imageCanvas1').css('z-index','1');
+        var reader = new FileReader();
+        reader.onload = function(event){
+            var img = new Image();
+            img.onload = function(){
+                //canvas.width = img.width;
+                //canvas.height = img.height;
+                //ctx.drawImage(img, 150, 150, 250, 150);
+            }
+
+            //second image drag
+          
+        var canvasOffset=$("#imageCanvas1").offset();
+        var offsetX=canvasOffset.left;
+        var offsetY=canvasOffset.top;
+        var canvasWidth=canvas.width;
+        var canvasHeight=canvas.height;
+        var isDragging=false;
+
+        function handleMouseDown(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // set the drag flag
+          isDragging=true;
+        }
+
+        function handleMouseUp(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // clear the drag flag
+          isDragging=false;
+        }
+
+        function handleMouseOut(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // user has left the canvas, so clear the drag flag
+          //isDragging=false;
+        }
+
+        function handleMouseMove(e){
+          canMouseX=parseInt(e.clientX-offsetX);
+          canMouseY=parseInt(e.clientY-offsetY);
+          // if the drag flag is set, clear the canvas and draw the image
+          if(isDragging){
+            
+              ctx.clearRect(0,0,canvasWidth,canvasHeight);
+              ctx.drawImage(img,canMouseX-128/2,canMouseY-120/2,200,180);
+          }
+        }
+
+        $("#imageCanvas1").mousedown(function(e){handleMouseDown(e);});
+        $("#imageCanvas1").mousemove(function(e){handleMouseMove(e);});
+        $("#imageCanvas1").mouseup(function(e){handleMouseUp(e);});
+        $("#imageCanvas1").mouseout(function(e){handleMouseOut(e);});
+        // drag End
+
+        var img = new Image();
+        img.onload = function() {
+          ctx.clearRect(0,0,canvasWidth,canvasHeight);
+          ctx.drawImage(img, 150, 100, 200, 180);
+        };
+      //second image drag end
+        img.src = event.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);     
+    }
+
+
+    /***********add text in canvas************/
+    $('#text_add').click(function(){ $('#text_add_section').css('display','block'); });
+    $('#add_new_text').click(function(){ 
+      $('#textcanvas').css('z-index','1');
+      $('#imageCanvas').css('z-index','-1');
+      $('#imageCanvas1').css('z-index','-1');      
+      // canvas related variables
+        var canvas = document.getElementById("textcanvas");
+        var ctx = canvas.getContext("2d");
+
+        // variables used to get mouse position on the canvas
+        var $canvas = $("#textcanvas");
+        var canvasOffset = $canvas.offset();
+        var offsetX = canvasOffset.left;
+        var offsetY = canvasOffset.top;
+        var scrollX = $canvas.scrollLeft();
+        var scrollY = $canvas.scrollTop();
+
+        // variables to save last mouse position
+        // used to see how far the user dragged the mouse
+        // and then move the text by that distance
+        var startX;
+        var startY;
+
+        // an array to hold text objects
+        var texts = [];
+
+        // this var will hold the index of the hit-selected text
+        var selectedText = -1;
+
+        // clear the canvas & redraw all texts
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (var i = 0; i < texts.length; i++) {
+                var text = texts[i];
+                ctx.fillText(text.text, text.x, text.y);
+            }
+        }
+
+          // test if x,y is inside the bounding box of texts[textIndex]
+          function textHittest(x, y, textIndex) {
+              var text = texts[textIndex];
+              return (x >= text.x && x <= text.x + text.width && y >= text.y - text.height && y <= text.y);
+          }
+
+          // handle mousedown events
+          // iterate through texts[] and see if the user
+          // mousedown'ed on one of them
+          // If yes, set the selectedText to the index of that text
+          function handleMouseDown(e) {
+              e.preventDefault();
+              startX = parseInt(e.clientX - offsetX);
+              startY = parseInt(e.clientY - offsetY);
+              // Put your mousedown stuff here
+              for (var i = 0; i < texts.length; i++) {
+                  if (textHittest(startX, startY, i)) {
+                      selectedText = i;
+                  }
+              }
+          }
+
+          // done dragging
+          function handleMouseUp(e) {
+              e.preventDefault();
+              selectedText = -1;
+          }
+
+          // also done dragging
+          function handleMouseOut(e) {
+              e.preventDefault();
+              selectedText = -1;
+          }
+
+          // handle mousemove events
+          // calc how far the mouse has been dragged since
+          // the last mousemove event and move the selected text
+          // by that distance
+          function handleMouseMove(e) {
+              if (selectedText < 0) {
+                  return;
+              }
+              e.preventDefault();
+              mouseX = parseInt(e.clientX - offsetX);
+              mouseY = parseInt(e.clientY - offsetY);
+
+              // Put your mousemove stuff here
+              var dx = mouseX - startX;
+              var dy = mouseY - startY;
+              startX = mouseX;
+              startY = mouseY;
+
+              var text = texts[selectedText];
+              text.x += dx;
+              text.y += dy;
+              draw();
+      }
+
+      // listen for mouse events
+      $("#textcanvas").mousedown(function (e) {
+          handleMouseDown(e);
+      });
+      $("#textcanvas").mousemove(function (e) {
+          handleMouseMove(e);
+      });
+      $("#textcanvas").mouseup(function (e) {
+          handleMouseUp(e);
+      });
+      $("#textcanvas").mouseout(function (e) {
+          handleMouseOut(e);
+      });
+        // calc the y coordinate for this text on the canvas
+        var y = texts.length * 20 + 20;
+
+        // get the text from the input element
+        var text = {
+            text: $("#add_text").val(),
+            x: 20,
+            y: y
+        };
+
+        // calc the size of this text for hit-testing purposes
+        ctx.font = "30px Arial";
+        text.width = ctx.measureText(text.text).width;
+        text.height = 16;
+
+        // put this new text in the texts array
+        texts.push(text);
+
+        // redraw everything
+        draw();
+       // var text = $('#add_text').val();
+       // var canvas = document.getElementById("imageCanvas");
+       // var ctx = canvas.getContext("2d");
+       // ctx.font = "30px Arial";
+       // ctx.fillText(text,180,200); 
+       $('#text_add_section').css('display','none');
+       $('#add_text').val('');
+    });
+
+    /***********download created canvas image************/
+    function download_image(){
+
+      var canvas = document.getElementById("imageCanvas");
+var canvas2 = document.getElementById("imageCanvas");
+var canvas3 = document.getElementById("imageCanvas1");
+var image = overlayCanvases(canvas,canvas2,canvas3);
+     //var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+console.log(image)
+//     window.location.href= image;
+
+var iframe = "<iframe width='100%' height='100%' src='" + image + "'></iframe>"
+var x = window.open();
+x.document.open();
+x.document.write(iframe);
+x.document.close();
+	//document.getElementById("downloadDiv").innerHTML = link;
+    }
+
+   </script>

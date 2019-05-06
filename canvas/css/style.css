@@ -1,0 +1,29 @@
+ul#url-list {
+    list-style-type: none;
+    display: flex;
+   }
+   ul#url-list li {
+       width: 200px;
+       height: 150px;
+       border: 2px solid #3a3838;
+       padding: 5px;
+       margin-right: 10px;
+   }
+   ul#url-list li img {
+       height:100%;
+       width:100%;
+   }
+   ul#url-list li h4 {
+       margin: -30px 0px 0px 78px;
+       color: #fff;
+   }
+   .canvas_section {
+    margin-left: 40px;
+    display: -webkit-box;
+   }
+   .canvas_section div {
+       border: 2px solid #3a3838;
+       margin-left: 10px;
+       padding: 10px 50px;
+   }
+   #imageLoader{display:none;}
